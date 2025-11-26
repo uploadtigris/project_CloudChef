@@ -44,33 +44,14 @@ High-level view of ChefTec’s cloud deployment:
 ```mermaid
 graph LR
 
-    %% ─────────────────────────────────────
+    %% ============================================================
     %% Client Layer
-    %% ─────────────────────────────────────
+    %% ============================================================
     Client[User Browser / Mobile App] --> ALB["Application Load Balancer (HTTPS 443)"]
 
-    %% ─────────────────────────────────────
-    %% Terraform Layer (Infra Provisioning)
-    %% ─────────────────────────────────────
-    Terraform["Terraform (Infrastructure Provisioning)"]
-
-    Terraform --> ALB
-    Terraform --> VPC[VPC, Subnets, Routes, Security Groups]
-    Terraform --> RDS[(RDS Database)]
-    Terraform --> FTG["Frontend EC2 Auto Scale Group"]
-    Terraform --> APITG["API EC2 Auto Scale Group"]
-
-    %% ─────────────────────────────────────
-    %% Ansible Layer (Host Configuration)
-    %% ─────────────────────────────────────
-    Ansible["Ansible (OS + Packages + Docker Config)"]
-
-    Ansible --> FTG
-    Ansible --> APITG
-
-    %% ─────────────────────────────────────
-    %% Frontend Tier
-    %% ─────────────────────────────────────
+    %% ============================================================
+    %% Frontend Tier (Terraform + Ansible)
+    %% ============================================================
     subgraph "Frontend Tier"
         FTG1[EC2 Frontend 1]
         FTG2[EC2 Frontend 2]
@@ -84,9 +65,9 @@ graph LR
     FTG1 --> Web1
     FTG2 --> Web2
 
-    %% ─────────────────────────────────────
-    %% API Tier
-    %% ─────────────────────────────────────
+    %% ============================================================
+    %% API Tier (Terraform + Ansible)
+    %% ============================================================
     subgraph "API Tier"
         APITG1[EC2 API 1]
         APITG2[EC2 API 2]
@@ -100,11 +81,11 @@ graph LR
     APITG1 --> API1
     APITG2 --> API2
 
-    %% ─────────────────────────────────────
-    %% Database Tier
-    %% ─────────────────────────────────────
+    %% ============================================================
+    %% Database (Terraform Only)
+    %% ============================================================
     subgraph "Database (Private Subnet)"
-        RDS
+        RDS[(RDS Database)]
     end
 
     Web1 --> RDS
@@ -112,9 +93,9 @@ graph LR
     API1 --> RDS
     API2 --> RDS
 
-    %% ─────────────────────────────────────
-    %% CICD Layer (App Build & Deployment)
-    %% ─────────────────────────────────────
+    %% ============================================================
+    %% CICD Layer (App Deployment Only)
+    %% ============================================================
     subgraph "Application Code & CI/CD"
         Git[Git Repository]
         Pipeline[CI/CD Pipeline - Build & Push Images]
@@ -132,9 +113,9 @@ graph LR
     AppConfig --> API1
     AppConfig --> API2
 
-    %% ─────────────────────────────────────
+    %% ============================================================
     %% Monitoring Layer
-    %% ─────────────────────────────────────
+    %% ============================================================
     subgraph "Monitoring & Logging"
         Prometheus[Prometheus Metrics]
         ELK[ELK Stack / OpenSearch Logs]
@@ -149,6 +130,40 @@ graph LR
     FTG2 --> ELK
     APITG1 --> ELK
     APITG2 --> ELK
+
+
+    %% ============================================================
+    %% CLASS ASSIGNMENTS
+    %% ============================================================
+
+    %% Terraform Only
+    class ALB,VPC,RDS terraform;
+
+    %% Ansible Only
+    class AppConfig ansible;
+
+    %% Terraform + Ansible (dual outline)
+    class FTG1,FTG2,APITG1,APITG2,Web1,Web2,API1,API2 dual;
+
+    %% CI/CD (neutral)
+    class Git,Pipeline neutral;
+
+
+    %% ============================================================
+    %% COLOR DEFINITIONS
+    %% ============================================================
+
+    %% Blue border = Terraform
+    classDef terraform stroke:#1E90FF,stroke-width:3px,color:#fff;
+
+    %% Red border = Ansible
+    classDef ansible stroke:#FF4C4C,stroke-width:3px,color:#fff;
+
+    %% Dual border = Terraform outer, Ansible inner
+    classDef dual stroke:#1E90FF,stroke-width:5px,color:#fff;
+
+    %% Neutral gray
+    classDef neutral stroke:#666,stroke-width:2px,color:#fff;
 ```
 
 ---
