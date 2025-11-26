@@ -37,44 +37,70 @@ A full, modern recreation of the **ChefTec** application using modern developmen
 ## Cloud Deployment Diagram
 
 High-level view of ChefTec’s cloud deployment:
-
 ```mermaid
 graph LR
-    %% Client
-    Client[User Browser / Mobile App] --> ALB["Application Load Balancer - HTTPS 443"]
 
-    %% Target Groups
-    subgraph "Frontend Target Group"
-        FTG1[EC2 1 - Ubuntu + Docker]
-        FTG2[EC2 2 - Ubuntu + Docker]
-    end
+    %% ─────────────────────────────────────
+    %% Client Layer
+    %% ─────────────────────────────────────
+    Client[User Browser / Mobile App] --> ALB["Application Load Balancer (HTTPS 443)"]
 
-    subgraph "API Target Group"
-        APITG1[EC2 3 - Ubuntu + Docker]
-        APITG2[EC2 4 - Ubuntu + Docker]
+    %% ─────────────────────────────────────
+    %% Terraform Layer (Infra Provisioning)
+    %% ─────────────────────────────────────
+    Terraform["Terraform (Infrastructure Provisioning)"]
+
+    Terraform --> ALB
+    Terraform --> VPC[VPC, Subnets, Routes, Security Groups]
+    Terraform --> RDS[(RDS Database)]
+    Terraform --> FTG["Frontend EC2 Auto Scale Group"]
+    Terraform --> APITG["API EC2 Auto Scale Group"]
+
+    %% ─────────────────────────────────────
+    %% Ansible Layer (Host Configuration)
+    %% ─────────────────────────────────────
+    Ansible["Ansible (OS + Packages + Docker Config)"]
+
+    Ansible --> FTG
+    Ansible --> APITG
+
+    %% ─────────────────────────────────────
+    %% Frontend Tier
+    %% ─────────────────────────────────────
+    subgraph "Frontend Tier"
+        FTG1[EC2 Frontend 1]
+        FTG2[EC2 Frontend 2]
+        Web1[Frontend Container]
+        Web2[Frontend Container]
     end
 
     ALB --> FTG1
     ALB --> FTG2
-    ALB --> APITG1
-    ALB --> APITG2
 
-    %% Containers
-    subgraph "Containers"
-        Web1[Frontend Web App Container]
-        Web2[Frontend Web App Container]
+    FTG1 --> Web1
+    FTG2 --> Web2
+
+    %% ─────────────────────────────────────
+    %% API Tier
+    %% ─────────────────────────────────────
+    subgraph "API Tier"
+        APITG1[EC2 API 1]
+        APITG2[EC2 API 2]
         API1[API Container]
         API2[API Container]
     end
 
-    FTG1 --> Web1
-    FTG2 --> Web2
+    ALB --> APITG1
+    ALB --> APITG2
+
     APITG1 --> API1
     APITG2 --> API2
 
-    %% Database
-    subgraph "Database - Private Subnet"
-        RDS[(RDS Database)]
+    %% ─────────────────────────────────────
+    %% Database Tier
+    %% ─────────────────────────────────────
+    subgraph "Database (Private Subnet)"
+        RDS
     end
 
     Web1 --> RDS
@@ -82,58 +108,43 @@ graph LR
     API1 --> RDS
     API2 --> RDS
 
-    %% Terraform Node (No grey box)
-    Terraform["Terraform IaC Scripts"]
-    Terraform --> FTG1
-    Terraform --> FTG2
-    Terraform --> APITG1
-    Terraform --> APITG2
-    Terraform --> ALB
-    Terraform --> RDS
-
-    %% Application Code / Config
-    subgraph "Application Code & Config"
-        Git[Git Repository - App Code & Config]
-        Pipeline[CI/CD Pipeline]
-        AppConfig[".env, docker-compose.yml, nginx.conf, API keys"]
+    %% ─────────────────────────────────────
+    %% CICD Layer (App Build & Deployment)
+    %% ─────────────────────────────────────
+    subgraph "Application Code & CI/CD"
+        Git[Git Repository]
+        Pipeline[CI/CD Pipeline - Build & Push Images]
+        AppConfig["App Config (.env, docker-compose.yml, nginx.conf)"]
     end
 
-    Git --> Pipeline --> Web1
-    Git --> Pipeline --> Web2
-    Git --> Pipeline --> API1
-    Git --> Pipeline --> API2
+    Git --> Pipeline
+    Pipeline --> Web1
+    Pipeline --> Web2
+    Pipeline --> API1
+    Pipeline --> API2
+
     AppConfig --> Web1
     AppConfig --> Web2
     AppConfig --> API1
     AppConfig --> API2
 
-    %% Monitoring & Logging
+    %% ─────────────────────────────────────
+    %% Monitoring Layer
+    %% ─────────────────────────────────────
     subgraph "Monitoring & Logging"
         Prometheus[Prometheus Metrics]
-        ELK[ELK Stack Logs]
+        ELK[ELK Stack / OpenSearch Logs]
     end
 
     FTG1 --> Prometheus
     FTG2 --> Prometheus
     APITG1 --> Prometheus
     APITG2 --> Prometheus
+
     FTG1 --> ELK
     FTG2 --> ELK
     APITG1 --> ELK
     APITG2 --> ELK
-
-    %% Environments
-    subgraph "Development Environment"
-        DevFTG1[Dev Frontend EC2 + Docker]
-        DevAPITG1[Dev API EC2 + Docker]
-    end
-
-    subgraph "Production Environment"
-        ProdFTG1["Prod Frontend Target Group 1"]
-        ProdFTG2["Prod Frontend Target Group 2"]
-        ProdAPITG1["Prod API Target Group 1"]
-        ProdAPITG2["Prod API Target Group 2"]
-    end
 ```
 
 **Components**:
