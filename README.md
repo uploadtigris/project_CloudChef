@@ -177,11 +177,11 @@ graph TD
     API1 --> RDS
     API2 --> RDS
 
-    %% DevOps / Infrastructure
-    subgraph "DevOps / Infrastructure"
-        Git[Git Repository - Config Files]
+    %% DevOps / Infrastructure (IaC) - Removed inline style
+    subgraph "DevOps / IaC"
+        Git[Git Repository - Config & Terraform]
         Pipeline[CI/CD Pipeline]
-        Terraform["Infrastructure as Code"]
+        Terraform["Terraform IaC Scripts"]
     end
 
     Git --> Pipeline
@@ -194,10 +194,20 @@ graph TD
     Terraform --> APITG1
     Terraform --> APITG2
 
+    %% Application Config
+    subgraph "Application Configuration"
+        AppConfig[".env, docker-compose.yml, nginx.conf, API keys"]
+    end
+
+    AppConfig --> Web1
+    AppConfig --> Web2
+    AppConfig --> API1
+    AppConfig --> API2
+
     %% Monitoring & Logging
     subgraph "Monitoring & Logging"
-        Prometheus[Monitoring]
-        ELK[Logging - ELK Stack]
+        Prometheus[Prometheus - Metrics]
+        ELK[ELK Stack - Logs]
     end
 
     FTG1 --> Prometheus
@@ -216,10 +226,10 @@ graph TD
     end
 
     subgraph "Production Environment"
-        ProdFTG1
-        ProdFTG2
-        ProdAPITG1
-        ProdAPITG2
+        ProdFTG1["Prod Frontend Target Group 1"]
+        ProdFTG2["Prod Frontend Target Group 2"]
+        ProdAPITG1["Prod API Target Group 1"]
+        ProdAPITG2["Prod API Target Group 2"]
     end
 ```
 
