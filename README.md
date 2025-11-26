@@ -47,24 +47,24 @@ graph LR
     %% ============================================================
     %% Client Layer
     %% ============================================================
-    Client[User Browser / Mobile App] --> ALB["Application Load Balancer (HTTPS 443)"]
+    Client[User Browser / Mobile App] --> ALB["Application Load Balancer - HTTPS 443"]
 
     %% ============================================================
     %% Frontend + API (Grouped Tightly)
     %% ============================================================
-    subgraph "Frontend & API Tiers"
+    subgraph Frontend_and_API_Tiers
         direction LR
 
-        %% ---------------------- Frontend Tier ----------------------
-        subgraph "Frontend Tier"
-            FTG1["EC2 Frontend 1<br/>(Ubuntu + Docker + Web Container)"]
-            FTG2["EC2 Frontend 2<br/>(Ubuntu + Docker + Web Container)"]
+        %% Frontend Tier
+        subgraph Frontend_Tier
+            FTG1["EC2 Frontend 1\nUbuntu + Docker + Web Container"]
+            FTG2["EC2 Frontend 2\nUbuntu + Docker + Web Container"]
         end
 
-        %% ---------------------- API Tier ---------------------------
-        subgraph "API Tier"
-            APITG1["EC2 API 1<br/>(Ubuntu + Docker + API Container)"]
-            APITG2["EC2 API 2<br/>(Ubuntu + Docker + API Container)"]
+        %% API Tier
+        subgraph API_Tier
+            APITG1["EC2 API 1\nUbuntu + Docker + API Container"]
+            APITG2["EC2 API 2\nUbuntu + Docker + API Container"]
         end
     end
 
@@ -74,12 +74,11 @@ graph LR
     ALB --> APITG1
     ALB --> APITG2
 
-
     %% ============================================================
     %% Database Layer
     %% ============================================================
-    subgraph "Database (Private Subnet)"
-        RDS[(RDS Database)]
+    subgraph Database_Private_Subnet
+        RDS["RDS Database"]
     end
 
     FTG1 --> RDS
@@ -87,13 +86,12 @@ graph LR
     APITG1 --> RDS
     APITG2 --> RDS
 
-
     %% ============================================================
     %% Monitoring Layer
     %% ============================================================
-    subgraph "Monitoring & Logging"
-        Prometheus[Prometheus Metrics]
-        ELK[ELK Stack / OpenSearch Logs]
+    subgraph Monitoring_and_Logging
+        Prometheus["Prometheus Metrics"]
+        ELK["ELK Stack / OpenSearch Logs"]
     end
 
     FTG1 --> Prometheus
@@ -106,29 +104,23 @@ graph LR
     APITG1 --> ELK
     APITG2 --> ELK
 
-
     %% ============================================================
-    %% CI/CD Layer (Bottom)
+    %% CI/CD Layer
     %% ============================================================
-    subgraph "Application Code & CI/CD"
+    subgraph Application_Code_and_CICD
         direction LR
 
-        Git[Git Repository<br/>- App Code<br/>- Dockerfiles<br/>- Ansible Playbooks]
-
-        Pipeline[CI/CD Pipeline<br/>- Build Docker Images<br/>- Test Code<br/>- Push to ECR<br/>- Trigger Ansible Deploy]
-
-        ECR[ECR (Elastic Container Registry)<br/>Stores Built Docker Images]
-
-        Ansible[Ansible Automation<br/>SSH → EC2<br/>Pull Image → Restart Container]
-
-        AppConfig["Application Config<br/>.env, docker-compose.yml, nginx.conf, secrets"]
+        Git["Git Repository\n- App Code\n- Dockerfiles\n- Ansible Playbooks"]
+        Pipeline["CI/CD Pipeline\nBuild Images → Push → Deploy"]
+        ECR["ECR Registry\nStores Docker Images"]
+        Ansible["Ansible Automation\nDeploys Containers on EC2"]
+        AppConfig["App Config\n.env, compose files, nginx.conf"]
     end
 
     Git --> Pipeline
     Pipeline --> ECR
     ECR --> Ansible
 
-    %% Deployment to EC2 Instances
     Ansible --> FTG1
     Ansible --> FTG2
     Ansible --> APITG1
@@ -139,9 +131,8 @@ graph LR
     AppConfig --> APITG1
     AppConfig --> APITG2
 
-
     %% ============================================================
-    %% Class Assignments (Terraform / Ansible / Dual)
+    %% Class Assignments
     %% ============================================================
 
     %% Terraform-only resources
@@ -150,12 +141,11 @@ graph LR
     %% Ansible-only resources
     class AppConfig,Ansible ansible;
 
-    %% Dual (Terraform + Ansible)
+    %% Dual-managed resources
     class FTG1,FTG2,APITG1,APITG2 dual;
 
     %% Neutral
     class Git,Pipeline neutral;
-
 
     %% ============================================================
     %% Color Definitions
