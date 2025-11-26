@@ -50,68 +50,43 @@ graph LR
     Client[User Browser / Mobile App] --> ALB["Application Load Balancer (HTTPS 443)"]
 
     %% ============================================================
-    %% Frontend Tier (Terraform + Ansible)
+    %% Frontend + API (Grouped Tightly)
     %% ============================================================
-    subgraph "Frontend Tier"
-        FTG1[EC2 Frontend 1]
-        FTG2[EC2 Frontend 2]
-        Web1[Frontend Container]
-        Web2[Frontend Container]
+    subgraph "Frontend & API Tiers"
+        direction LR
+
+        %% ---------------------- Frontend Tier ----------------------
+        subgraph "Frontend Tier"
+            FTG1["EC2 Frontend 1<br/>(Ubuntu + Docker + Web Container)"]
+            FTG2["EC2 Frontend 2<br/>(Ubuntu + Docker + Web Container)"]
+        end
+
+        %% ---------------------- API Tier ---------------------------
+        subgraph "API Tier"
+            APITG1["EC2 API 1<br/>(Ubuntu + Docker + API Container)"]
+            APITG2["EC2 API 2<br/>(Ubuntu + Docker + API Container)"]
+        end
     end
 
+    %% Connections to ALB
     ALB --> FTG1
     ALB --> FTG2
-
-    FTG1 --> Web1
-    FTG2 --> Web2
-
-    %% ============================================================
-    %% API Tier (Terraform + Ansible)
-    %% ============================================================
-    subgraph "API Tier"
-        APITG1[EC2 API 1]
-        APITG2[EC2 API 2]
-        API1[API Container]
-        API2[API Container]
-    end
-
     ALB --> APITG1
     ALB --> APITG2
 
-    APITG1 --> API1
-    APITG2 --> API2
 
     %% ============================================================
-    %% Database (Terraform Only)
+    %% Database Layer
     %% ============================================================
     subgraph "Database (Private Subnet)"
         RDS[(RDS Database)]
     end
 
-    Web1 --> RDS
-    Web2 --> RDS
-    API1 --> RDS
-    API2 --> RDS
+    FTG1 --> RDS
+    FTG2 --> RDS
+    APITG1 --> RDS
+    APITG2 --> RDS
 
-    %% ============================================================
-    %% CICD Layer (App Deployment Only)
-    %% ============================================================
-    subgraph "Application Code & CI/CD"
-        Git[Git Repository]
-        Pipeline[CI/CD Pipeline - Build & Push Images]
-        AppConfig["App Config (.env, docker-compose.yml, nginx.conf)"]
-    end
-
-    Git --> Pipeline
-    Pipeline --> Web1
-    Pipeline --> Web2
-    Pipeline --> API1
-    Pipeline --> API2
-
-    AppConfig --> Web1
-    AppConfig --> Web2
-    AppConfig --> API1
-    AppConfig --> API2
 
     %% ============================================================
     %% Monitoring Layer
@@ -133,24 +108,46 @@ graph LR
 
 
     %% ============================================================
-    %% CLASS ASSIGNMENTS
+    %% CI/CD Layer (Bottom)
+    %% ============================================================
+    subgraph "Application Code & CI/CD"
+        direction LR
+        Git[Git Repository]
+        Pipeline[CI/CD Pipeline - Build & Push Images]
+        AppConfig["App Config (.env, docker-compose.yml, nginx.conf)"]
+    end
+
+    Git --> Pipeline
+    Pipeline --> FTG1
+    Pipeline --> FTG2
+    Pipeline --> APITG1
+    Pipeline --> APITG2
+
+    AppConfig --> FTG1
+    AppConfig --> FTG2
+    AppConfig --> APITG1
+    AppConfig --> APITG2
+
+
+    %% ============================================================
+    %% Class Assignments (Terraform / Ansible / Dual)
     %% ============================================================
 
-    %% Terraform Only
-    class ALB,VPC,RDS terraform;
+    %% Terraform-only resources
+    class ALB,RDS terraform;
 
-    %% Ansible Only
+    %% Ansible-only resources
     class AppConfig ansible;
 
-    %% Terraform + Ansible (dual outline)
-    class FTG1,FTG2,APITG1,APITG2,Web1,Web2,API1,API2 dual;
+    %% Dual (Terraform + Ansible)
+    class FTG1,FTG2,APITG1,APITG2 dual;
 
-    %% CI/CD (neutral)
+    %% Neutral
     class Git,Pipeline neutral;
 
 
     %% ============================================================
-    %% COLOR DEFINITIONS
+    %% Color Definitions
     %% ============================================================
 
     %% Blue border = Terraform
@@ -159,7 +156,7 @@ graph LR
     %% Red border = Ansible
     classDef ansible stroke:#FF4C4C,stroke-width:3px,color:#fff;
 
-    %% Dual border = Terraform outer, Ansible inner
+    %% Dual = Terraform outer (blue) + smaller inner (red) effect
     classDef dual stroke:#1E90FF,stroke-width:5px,color:#fff;
 
     %% Neutral gray
