@@ -112,16 +112,27 @@ graph LR
     %% ============================================================
     subgraph "Application Code & CI/CD"
         direction LR
-        Git[Git Repository]
-        Pipeline[CI/CD Pipeline - Build & Push Images]
-        AppConfig["App Config (.env, docker-compose.yml, nginx.conf)"]
+
+        Git[Git Repository<br/>- App Code<br/>- Dockerfiles<br/>- Ansible Playbooks]
+
+        Pipeline[CI/CD Pipeline<br/>- Build Docker Images<br/>- Test Code<br/>- Push to ECR<br/>- Trigger Ansible Deploy]
+
+        ECR[ECR (Elastic Container Registry)<br/>Stores Built Docker Images]
+
+        Ansible[Ansible Automation<br/>SSH → EC2<br/>Pull Image → Restart Container]
+
+        AppConfig["Application Config<br/>.env, docker-compose.yml, nginx.conf, secrets"]
     end
 
     Git --> Pipeline
-    Pipeline --> FTG1
-    Pipeline --> FTG2
-    Pipeline --> APITG1
-    Pipeline --> APITG2
+    Pipeline --> ECR
+    ECR --> Ansible
+
+    %% Deployment to EC2 Instances
+    Ansible --> FTG1
+    Ansible --> FTG2
+    Ansible --> APITG1
+    Ansible --> APITG2
 
     AppConfig --> FTG1
     AppConfig --> FTG2
@@ -134,10 +145,10 @@ graph LR
     %% ============================================================
 
     %% Terraform-only resources
-    class ALB,RDS terraform;
+    class ALB,RDS,ECR terraform;
 
     %% Ansible-only resources
-    class AppConfig ansible;
+    class AppConfig,Ansible ansible;
 
     %% Dual (Terraform + Ansible)
     class FTG1,FTG2,APITG1,APITG2 dual;
@@ -150,16 +161,9 @@ graph LR
     %% Color Definitions
     %% ============================================================
 
-    %% Blue border = Terraform
     classDef terraform stroke:#1E90FF,stroke-width:3px,color:#fff;
-
-    %% Red border = Ansible
     classDef ansible stroke:#FF4C4C,stroke-width:3px,color:#fff;
-
-    %% Dual = Terraform outer (blue) + smaller inner (red) effect
     classDef dual stroke:#1E90FF,stroke-width:5px,color:#fff;
-
-    %% Neutral gray
     classDef neutral stroke:#666,stroke-width:2px,color:#fff;
 ```
 
