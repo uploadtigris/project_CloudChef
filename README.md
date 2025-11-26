@@ -38,6 +38,8 @@ A full, modern recreation of the **ChefTec** application, rebuilt from the groun
 
 A high-level view of the planned cloud deployment for ChefTec:
 
+*This diagram represents the flow from client requests through the load balancer, web and application tiers, to the database, with CI/CD, IaC, and monitoring included.*
+
 ```mermaid
 graph TD
     subgraph Client
@@ -76,7 +78,150 @@ graph TD
     WebApp --> ELK
 ```
 
-*This diagram represents the flow from client requests through the load balancer, web and application tiers, to the database, with CI/CD, IaC, and monitoring included.*
+This diagram illustrates the ChefTec cloud deployment architecture. Client requests enter through an Application Load Balancer (ALB), which routes traffic to separate target groups for frontend and API servers. Each target group consists of EC2 instances running Ubuntu and Docker containers. The containers host the actual application code, while all backend services connect securely to an RDS/Aurora database in private subnets. The architecture emphasizes scalability, high availability, and security.
+
+```mermaid
+graph TD
+    Client[User Browser / Mobile App] --> ALB["Application Load Balancer - HTTPS 443"]
+
+    subgraph "Frontend Target Group"
+        FTG1[EC2 Instance 1 - Ubuntu + Docker]
+        FTG2[EC2 Instance 2 - Ubuntu + Docker]
+    end
+
+    subgraph "API Target Group"
+        APITG1[EC2 Instance 3 - Ubuntu + Docker]
+        APITG2[EC2 Instance 4 - Ubuntu + Docker]
+    end
+
+    ALB --> FTG1
+    ALB --> FTG2
+    ALB --> APITG1
+    ALB --> APITG2
+
+    subgraph "Containers on EC2"
+        Web1[Frontend Web App Container]
+        Web2[Frontend Web App Container]
+        API1[API Container]
+        API2[API Container]
+    end
+
+    FTG1 --> Web1
+    FTG2 --> Web2
+    APITG1 --> API1
+    APITG2 --> API2
+
+    subgraph "Database Tier - Private Subnet"
+        RDS[(RDS / Aurora Database)]
+    end
+
+    Web1 --> RDS
+    Web2 --> RDS
+    API1 --> RDS
+    API2 --> RDS
+```
+
+**Client**: User browser or mobile app accessing ChefTec
+
+**ALB (Load Balancer)**: Routes HTTPS traffic to the right target group, handles health checks and SSL termination
+
+**Target Groups**: Groups of EC2 instances for frontend or API, checked for health
+
+**EC2 Instances (Ubuntu + Docker)**: Hosts frontend and API containers in private subnets
+
+**Containers**: Run the actual app code, isolated and portable
+
+**Database (RDS/Aurora)**: Stores app data securely in private subnets
+
+```mermaid
+graph TD
+    %% Clients
+    Client[User Browser / Mobile App] --> ALB["Application Load Balancer - HTTPS 443"]
+
+    %% Target Groups
+    subgraph "Frontend Target Group"
+        FTG1[EC2 Instance 1 - Ubuntu + Docker]
+        FTG2[EC2 Instance 2 - Ubuntu + Docker]
+    end
+
+    subgraph "API Target Group"
+        APITG1[EC2 Instance 3 - Ubuntu + Docker]
+        APITG2[EC2 Instance 4 - Ubuntu + Docker]
+    end
+
+    ALB --> FTG1
+    ALB --> FTG2
+    ALB --> APITG1
+    ALB --> APITG2
+
+    %% Containers
+    subgraph "Containers on EC2"
+        Web1[Frontend Web App Container]
+        Web2[Frontend Web App Container]
+        API1[API Container]
+        API2[API Container]
+    end
+
+    FTG1 --> Web1
+    FTG2 --> Web2
+    APITG1 --> API1
+    APITG2 --> API2
+
+    %% Database
+    subgraph "Database Tier - Private Subnet"
+        RDS[(RDS / Aurora Database)]
+    end
+
+    Web1 --> RDS
+    Web2 --> RDS
+    API1 --> RDS
+    API2 --> RDS
+
+    %% DevOps / Infrastructure
+    subgraph "DevOps / Infrastructure"
+        Git[Git Repository - Config Files]
+        Pipeline[CI/CD Pipeline]
+        Terraform["Infrastructure as Code"]
+    end
+
+    Git --> Pipeline
+    Pipeline --> FTG1
+    Pipeline --> FTG2
+    Pipeline --> APITG1
+    Pipeline --> APITG2
+    Terraform --> FTG1
+    Terraform --> FTG2
+    Terraform --> APITG1
+    Terraform --> APITG2
+
+    %% Monitoring & Logging
+    subgraph "Monitoring & Logging"
+        Prometheus[Monitoring]
+        ELK[Logging - ELK Stack]
+    end
+
+    FTG1 --> Prometheus
+    FTG2 --> Prometheus
+    APITG1 --> Prometheus
+    APITG2 --> Prometheus
+    FTG1 --> ELK
+    FTG2 --> ELK
+    APITG1 --> ELK
+    APITG2 --> ELK
+
+    %% Environments
+    subgraph "Development Environment"
+        DevFTG1[Dev Frontend EC2 + Docker]
+        DevAPITG1[Dev API EC2 + Docker]
+    end
+
+    subgraph "Production Environment"
+        ProdFTG1
+        ProdFTG2
+        ProdAPITG1
+        ProdAPITG2
+    end
+```
 
 ---
 
