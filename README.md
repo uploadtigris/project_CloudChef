@@ -55,20 +55,23 @@ graph TD
         subgraph "Database Tier"
             DB[(Database)]
         end
-        subgraph "CI/CD & IaC"
-            Git[Git Repository]
-            Pipeline[CI/CD Pipeline]
-            Terraform["Infrastructure as Code - Terraform"]
-        end
         subgraph "Monitoring & Logging"
             Prometheus[Monitoring]
             ELK[Logging - ELK Stack]
         end
     end
 
+    subgraph "DevOps / Infrastructure"
+        Git[Git Repository]
+        Pipeline[CI/CD Pipeline]
+        Terraform["Infrastructure as Code"]
+    end
+
     Browser --> LB --> WebApp --> API --> DB
     Git --> Pipeline --> WebApp
+    Terraform --> LB
     Terraform --> WebApp
+    Terraform --> API
     WebApp --> Prometheus
     WebApp --> ELK
 ```
