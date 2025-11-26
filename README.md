@@ -78,7 +78,7 @@ graph TD
     WebApp --> ELK
 ```
 
-This diagram illustrates the ChefTec cloud deployment architecture. Client requests enter through an Application Load Balancer (ALB), which routes traffic to separate target groups for frontend and API servers. Each target group consists of EC2 instances running Ubuntu and Docker containers. The containers host the actual application code, while all backend services connect securely to an RDS/Aurora database in private subnets. The architecture emphasizes scalability, high availability, and security.
+This diagram illustrates the ChefTec cloud deployment architecture. Client requests enter through an Application Load Balancer (ALB), which routes traffic to separate target groups for frontend and API servers. Each target group consists of EC2 instances running Ubuntu and Docker containers. The containers host the actual application code, while all backend services connect securely to an RDS database in private subnets. The architecture emphasizes scalability, high availability, and security.
 
 ```mermaid
 graph TD
@@ -112,7 +112,7 @@ graph TD
     APITG2 --> API2
 
     subgraph "Database Tier - Private Subnet"
-        RDS[(RDS / Aurora Database)]
+        RDS[(RDS Database)]
     end
 
     Web1 --> RDS
@@ -131,7 +131,7 @@ graph TD
 
 **Containers**: Run the actual app code, isolated and portable
 
-**Database (RDS/Aurora)**: Stores app data securely in private subnets
+**Database (RDS)**: Stores app data securely in private subnets
 
 ```mermaid
 graph TD
@@ -169,7 +169,7 @@ graph TD
 
     %% Database
     subgraph "Database Tier - Private Subnet"
-        RDS[(RDS / Aurora Database)]
+        RDS[(RDS Database)]
     end
 
     Web1 --> RDS
