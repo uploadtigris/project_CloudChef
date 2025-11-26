@@ -52,17 +52,17 @@ graph LR
     %% ============================================================
     %% Frontend + API (Grouped Tightly)
     %% ============================================================
-    subgraph Frontend_and_API_Tiers
+    subgraph Frontend and API Tiers
         direction LR
 
         %% Frontend Tier
-        subgraph Frontend_Tier
+        subgraph Frontend Tier
             FTG1["EC2 Frontend 1<br>Ubuntu + Docker + Web Container"]
             FTG2["EC2 Frontend 2<br>Ubuntu + Docker + Web Container"]
         end
 
         %% API Tier
-        subgraph API_Tier
+        subgraph API Tier
             APITG1["EC2 API 1<br>Ubuntu + Docker + API Container"]
             APITG2["EC2 API 2<br>Ubuntu + Docker + API Container"]
         end
@@ -77,7 +77,7 @@ graph LR
     %% ============================================================
     %% Database Layer
     %% ============================================================
-    subgraph Database_Private_Subnet
+    subgraph Database Private Subnet
         RDS["RDS Database"]
     end
 
