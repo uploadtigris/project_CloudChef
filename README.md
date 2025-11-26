@@ -58,11 +58,11 @@ graph TD
         subgraph "CI/CD & IaC"
             Git[Git Repository]
             Pipeline[CI/CD Pipeline]
-            Terraform[Infrastructure-as-Code (Terraform)]
+            Terraform["Infrastructure as Code - Terraform"]
         end
         subgraph "Monitoring & Logging"
             Prometheus[Monitoring]
-            ELK[Logging (ELK Stack)]
+            ELK[Logging - ELK Stack]
         end
     end
 
