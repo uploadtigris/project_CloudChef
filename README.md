@@ -89,7 +89,7 @@ graph LR
     %% ============================================================
     %% Monitoring Layer
     %% ============================================================
-    subgraph Monitoring_and_Logging
+    subgraph Monitoring and Logging
         Prometheus["Prometheus Metrics"]
         ELK["ELK Stack / OpenSearch Logs"]
     end
