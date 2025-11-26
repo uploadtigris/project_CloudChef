@@ -40,7 +40,9 @@ A full, modern recreation of the **ChefTec** application using cloud-native patt
 ## Cloud Deployment Diagram
 
 High-level view of ChefTec’s cloud deployment:
+🟦--> Terraform Managed
 
+🟥--> Ansible Managed
 ```mermaid
 graph LR
 
@@ -156,8 +158,6 @@ graph LR
     classDef dual stroke:#1E90FF,stroke-width:5px,color:#fff;
     classDef neutral stroke:#666,stroke-width:2px,color:#fff;
 ```
-
-🟦--> Terraform Managed | 🟥--> Ansible Managed
 ---
 
 ## Why This Architecture? (Concise Explained)
