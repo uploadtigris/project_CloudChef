@@ -157,9 +157,7 @@ graph LR
     classDef neutral stroke:#666,stroke-width:2px,color:#fff;
 ```
 
-🟦--> Terraform Managed
-
-🟥--> Ansible Managed
+🟦--> Terraform Managed | 🟥--> Ansible Managed
 ---
 
 ## Why This Architecture? (Concise Explained)
