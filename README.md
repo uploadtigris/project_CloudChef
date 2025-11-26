@@ -1,6 +1,6 @@
 # ChefTec Modern Rebuild
 
-A full, modern recreation of the **ChefTec** application using modern development practices, automation, and cloud-native architecture.
+A full, modern recreation of the **ChefTec** application using cloud-native patterns, Infrastructure-as-Code, containerization, and automated deployments.
 
 ---
 
@@ -9,34 +9,38 @@ A full, modern recreation of the **ChefTec** application using modern developmen
 1. [Project Goals](#project-goals)
 2. [Scope](#scope)
 3. [Cloud Deployment Diagram](#cloud-deployment-diagram)
-4. [Tech Stack (Planned)](#tech-stack-planned)
-5. [Status](#status)
-6. [Purpose](#purpose)
+4. [Why This Architecture? (Concise Explained)](#why-this-architecture-concise-explained)
+5. [Tech Stack (Planned)](#tech-stack-planned)
+6. [Status](#status)
+7. [Purpose](#purpose)
 
 ---
 
 ## Project Goals
 
-* Build **development** and **production** environments
-* Implement **user accounts, authentication, and role-based management**
-* Establish **Git-based version control workflows**
-* Deploy **cloud infrastructure** with scalability, security, and automation
+* Build separate **development** and **production** cloud environments
+* Implement **authentication**, **user roles**, and **account management**
+* Establish **Git-based workflows** for consistent development
+* Deploy **scalable, secure, automated** cloud infrastructure
+* Ensure long-term maintainability with Infrastructure-as-Code
 
 ---
 
 ## Scope
 
-* **Backend & frontend redesign**
-* **CI/CD automation** for testing, building, and deployment
-* **Infrastructure-as-Code (IaC)** for cloud deployments
-* Ensure **environment consistency** using containers or VMs
-* Provide **documentation and architecture diagrams**
+* Full **frontend + backend rebuild**
+* **CI/CD automation** for building and deploying containers
+* **Terraform-based Infrastructure-as-Code**
+* **Ansible automation** for provisioning VMs and Docker services
+* Standardized **environment configuration** across Dev/Prod
+* Clear **architecture diagrams and documentation**
 
 ---
 
 ## Cloud Deployment Diagram
 
 High-level view of ChefTec’s cloud deployment:
+
 ```mermaid
 graph LR
 
@@ -147,42 +151,108 @@ graph LR
     APITG2 --> ELK
 ```
 
-**Components**:
+---
 
-* **Client**: Browser or mobile app
-* **ALB**: Routes HTTPS traffic to frontend/API target groups
-* **Target Groups**: EC2 instances hosting frontend/API containers
-* **Containers**: Run application code in isolated environments
-* **Database (RDS)**: Stores app data in private subnets
-* **DevOps / IaC**: Git repository, CI/CD pipeline, Terraform scripts
-* **Application Config**: `.env`, container and web server config
-* **Monitoring & Logging**: Prometheus metrics, ELK stack logs
-* **Dev / Prod Environments**: Separate EC2 instances for safe development and production
+## Why This Architecture? (Concise Explained)
+
+### **1. Terraform for Infrastructure**
+
+Terraform handles **everything that should persist**: VPC, subnets, ALB, EC2 ASGs, RDS.
+
+* Cloud infra must be reproducible
+* Terraform produces a **single source of truth**
+* Changes are versioned and safely previewed
+
+**Why:** Infra should never be manually created.
+
+---
+
+### **2. Ansible for Host Configuration**
+
+Ansible configures each EC2 instance after Terraform creates them:
+
+* Installs packages, Docker, Nginx
+* Deploys system-level settings
+* Ensures servers are identical
+
+**Why:** Configuring hosts is not Terraform’s job.
+
+---
+
+### **3. CI/CD for Application Delivery**
+
+CI/CD builds container images and deploys them to the provisioned hosts:
+
+* Separate from infra provisioning
+* Automatically pushes updates
+* Keeps environments consistent
+
+**Why:** Code should deploy automatically—not tied to infra state.
+
+---
+
+### **4. Containers for Runtime Consistency**
+
+The frontend and API run in containers on each EC2 instance:
+
+* Isolates application behavior
+* Same runtime in dev/prod
+* Faster deployments
+
+**Why:** No “works on my machine” problems.
+
+---
+
+### **5. 3-Tier Layout for Scalability & Clarity**
+
+**Frontend → API → Database** tiers
+
+* Each tier can scale independently
+* Better fault isolation
+* Industry standard architecture
+
+**Why:** Clean separation of concerns.
+
+---
+
+### **6. RDS in Private Subnets**
+
+Database stays private, never exposed to the internet:
+
+* Most secure design
+* Only app/API containers can reach it
+
+**Why:** Databases must not be on public networks.
 
 ---
 
 ## Tech Stack (Planned)
 
-* **Application Framework:** TBD
-* **Database:** TBD
-* **Infrastructure-as-Code / Automation:** Terraform, Ansible
-* **Cloud Provider:** AWS / Azure / GCP
-* **CI/CD Tools:** GitHub Actions / Jenkins / GitLab CI
+| Layer                 | Tools                                |
+| --------------------- | ------------------------------------ |
+| **Infrastructure**    | Terraform                            |
+| **Config Management** | Ansible                              |
+| **Runtime**           | Docker containers                    |
+| **Cloud Provider**    | AWS / Azure / GCP                    |
+| **CI/CD**             | GitHub Actions / GitLab CI / Jenkins |
+| **Monitoring**        | Prometheus, ELK/OpenSearch           |
+| **App Framework**     | TBD                                  |
+| **Database**          | TBD                                  |
 
 ---
 
 ## Status
 
-* **Active development**
+**Active development**
+Architecture, IaC layout, and base automation are being built.
 
 ---
 
 ## Purpose
 
-This repository is a **learning project** and **practical rebuild** designed to deepen skills in:
+This repository serves as a **learning platform** and **real-world rebuild** to strengthen skills in:
 
-* Software architecture
-* DevOps workflows
 * Cloud engineering
-* Infrastructure design and automation
-
+* DevOps workflows
+* Infrastructure automation
+* Multi-tier architecture design
