@@ -157,6 +157,7 @@ graph LR
     classDef neutral stroke:#666,stroke-width:2px,color:#fff;
 ```
 🟦--> Terraform Managed
+
 🟥--> Ansible Managed
 ---
 
