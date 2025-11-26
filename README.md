@@ -57,14 +57,14 @@ graph LR
 
         %% Frontend Tier
         subgraph Frontend_Tier
-            FTG1["EC2 Frontend 1\nUbuntu + Docker + Web Container"]
-            FTG2["EC2 Frontend 2\nUbuntu + Docker + Web Container"]
+            FTG1["EC2 Frontend 1<br>Ubuntu + Docker + Web Container"]
+            FTG2["EC2 Frontend 2<br>Ubuntu + Docker + Web Container"]
         end
 
         %% API Tier
         subgraph API_Tier
-            APITG1["EC2 API 1\nUbuntu + Docker + API Container"]
-            APITG2["EC2 API 2\nUbuntu + Docker + API Container"]
+            APITG1["EC2 API 1<br>Ubuntu + Docker + API Container"]
+            APITG2["EC2 API 2<br>Ubuntu + Docker + API Container"]
         end
     end
 
@@ -107,14 +107,14 @@ graph LR
     %% ============================================================
     %% CI/CD Layer
     %% ============================================================
-    subgraph Application_Code_and_CICD
+    subgraph Application Code and CI/CD
         direction LR
 
-        Git["Git Repository\n- App Code\n- Dockerfiles\n- Ansible Playbooks"]
-        Pipeline["CI/CD Pipeline\nBuild Images → Push → Deploy"]
-        ECR["ECR Registry\nStores Docker Images"]
-        Ansible["Ansible Automation\nDeploys Containers on EC2"]
-        AppConfig["App Config\n.env, compose files, nginx.conf"]
+        Git["Git Repository<br>- App Code<br>- Dockerfiles<br>- Ansible Playbooks"]
+        Pipeline["CI/CD Pipeline<br>Build Images → Push → Deploy"]
+        ECR["ECR Registry<br>Stores Docker Images"]
+        Ansible["Ansible Automation<br>Deploys Containers on EC2"]
+        AppConfig["App Config<br>.env, compose files, nginx.conf"]
     end
 
     Git --> Pipeline
