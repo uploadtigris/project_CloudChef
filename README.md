@@ -40,6 +40,7 @@ A full, modern recreation of the **ChefTec** application using cloud-native patt
 ## Cloud Deployment Diagram
 
 High-level view of ChefTec’s cloud deployment:
+
 🟦--> Terraform Managed
 
 🟥--> Ansible Managed
