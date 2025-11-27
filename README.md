@@ -48,8 +48,9 @@ graph LR
 
         %% Frontend Tier
         subgraph Frontend Tier
-            FTG1["EC2 Frontend 1<br>Ubuntu + Docker + Web Container"]
-            FTG2["EC2 Frontend 2<br>Ubuntu + Docker + Web Container"]
+            FT1["EC2 Frontend - Location 1<br>Ubuntu + Docker + Web Container"]
+            FT2["EC2 Frontend - Location 2<br>Ubuntu + Docker + Web Container"]
+            FTAdmin["EC2 Frontend - Admin<br>Ubuntu + Docker + Web Container<br>Centralized Control / Recipe Management"]
         end
 
         %% API Tier
@@ -60,8 +61,9 @@ graph LR
     end
 
     %% Connections to ALB
-    ALB --> FTG1
-    ALB --> FTG2
+    ALB --> FT1
+    ALB --> FT2
+    ALB --> FTAdmin
     ALB --> APITG1
     ALB --> APITG2
 
@@ -72,8 +74,9 @@ graph LR
         RDS["RDS Database"]
     end
 
-    FTG1 --> RDS
-    FTG2 --> RDS
+    FT1 --> RDS
+    FT2 --> RDS
+    FTAdmin --> RDS
     APITG1 --> RDS
     APITG2 --> RDS
 
@@ -85,13 +88,15 @@ graph LR
         ELK["ELK Stack / OpenSearch Logs"]
     end
 
-    FTG1 --> Prometheus
-    FTG2 --> Prometheus
+    FT1 --> Prometheus
+    FT2 --> Prometheus
+    FTAdmin --> Prometheus
     APITG1 --> Prometheus
     APITG2 --> Prometheus
 
-    FTG1 --> ELK
-    FTG2 --> ELK
+    FT1 --> ELK
+    FT2 --> ELK
+    FTAdmin --> ELK
     APITG1 --> ELK
     APITG2 --> ELK
 
@@ -112,13 +117,15 @@ graph LR
     Pipeline --> ECR
     ECR --> Ansible
 
-    Ansible --> FTG1
-    Ansible --> FTG2
+    Ansible --> FT1
+    Ansible --> FT2
+    Ansible --> FTAdmin
     Ansible --> APITG1
     Ansible --> APITG2
 
-    AppConfig --> FTG1
-    AppConfig --> FTG2
+    AppConfig --> FT1
+    AppConfig --> FT2
+    AppConfig --> FTAdmin
     AppConfig --> APITG1
     AppConfig --> APITG2
 
@@ -133,7 +140,7 @@ graph LR
     class AppConfig,Ansible ansible;
 
     %% Dual-managed resources
-    class FTG1,FTG2,APITG1,APITG2 dual;
+    class FT1,FT2,FTAdmin,APITG1,APITG2 dual;
 
     %% Neutral
     class Git,Pipeline neutral;
