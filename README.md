@@ -1,18 +1,6 @@
-# ChefTec Modern Rebuild
+\# ChefTec Modern Rebuild
 
 A full, modern recreation of the **ChefTec** application using cloud-native patterns, Infrastructure-as-Code, containerization, and automated deployments.
-
----
-
-## Table of Contents
-
-1. [Project Goals](#project-goals)
-2. [Scope](#scope)
-3. [Cloud Deployment Diagram](#cloud-deployment-diagram)
-4. [Why This Architecture? (Concise Explained)](#why-this-architecture-concise-explained)
-5. [Tech Stack (Planned)](#tech-stack-planned)
-6. [Status](#status)
-7. [Purpose](#purpose)
 
 ---
 
@@ -159,108 +147,85 @@ graph LR
     classDef dual stroke:#1E90FF,stroke-width:5px,color:#fff;
     classDef neutral stroke:#666,stroke-width:2px,color:#fff;
 ```
----
 
-## Why This Architecture? (Concise Explained)
+## Why This Architecture
 
-### **1. Terraform for Infrastructure**
+This project is designed for **modularity, scalability, and automation**, reflecting modern cloud and DevOps practices.
 
-Terraform handles **everything that should persist**: VPC, subnets, ALB, EC2 ASGs, RDS.
+### **1. Terraform – Infrastructure as Code**
 
-* Cloud infra must be reproducible
-* Terraform produces a **single source of truth**
-* Changes are versioned and safely previewed
+Manages **persistent cloud resources**: VPC, subnets, ALB, EC2 Auto Scaling Groups, and RDS.
 
-**Why:** Infra should never be manually created.
+* Ensures reproducible, version-controlled infrastructure
+* Serves as a **single source of truth** for all environments
 
----
+### **2. Ansible – Host Configuration**
 
-### **2. Ansible for Host Configuration**
-
-Ansible configures each EC2 instance after Terraform creates them:
+Configures EC2 hosts after provisioning:
 
 * Installs packages, Docker, Nginx
-* Deploys system-level settings
-* Ensures servers are identical
+* Deploys containers and system-level settings
+* Ensures consistent, identical hosts across environments
 
-**Why:** Configuring hosts is not Terraform’s job.
+### **3. CI/CD – Automated Application Delivery**
 
----
+Pipelines handle **building, testing, and deploying code**:
 
-### **3. CI/CD for Application Delivery**
+* CI: Runs tests, builds Docker images, stores them in ECR
+* CD: Deploys containers to EC2 hosts via Ansible
+* Keeps development, staging, and production consistent
 
-CI/CD builds container images and deploys them to the provisioned hosts:
+### **4. Containers – Runtime Consistency**
 
-* Separate from infra provisioning
-* Automatically pushes updates
-* Keeps environments consistent
+Frontend and API services run in Docker containers:
 
-**Why:** Code should deploy automatically—not tied to infra state.
+* Isolated environments, same runtime in dev/prod
+* Faster, predictable deployments
+* Eliminates “works on my machine” issues
 
----
+### **5. Multi-Tier Layout**
 
-### **4. Containers for Runtime Consistency**
+**Frontend → API → Database** separation:
 
-The frontend and API run in containers on each EC2 instance:
+* Frontend: handles user interaction
+* API: handles business logic and database operations
+* Database: internal-only access, secure
+  **Benefits:** independent scaling, fault isolation, and maintainable architecture
 
-* Isolates application behavior
-* Same runtime in dev/prod
-* Faster deployments
+### **6. Private Database**
 
-**Why:** No “works on my machine” problems.
-
----
-
-### **5. 3-Tier Layout for Scalability & Clarity**
-
-**Frontend → API → Database** tiers
-
-* Each tier can scale independently
-* Better fault isolation
-* Industry standard architecture
-
-**Why:** Clean separation of concerns.
-
----
-
-### **6. RDS in Private Subnets**
-
-Database stays private, never exposed to the internet:
-
-* Most secure design
-* Only app/API containers can reach it
-
-**Why:** Databases must not be on public networks.
+RDS runs in **private subnets**, accessible only by API/frontend containers, ensuring security and internal-only access.
 
 ---
 
 ## Tech Stack (Planned)
 
-| Layer                 | Tools                                |
-| --------------------- | ------------------------------------ |
-| **Infrastructure**    | Terraform                            |
-| **Config Management** | Ansible                              |
-| **Runtime**           | Docker containers                    |
-| **Cloud Provider**    | AWS / Azure / GCP                    |
-| **CI/CD**             | GitHub Actions / GitLab CI / Jenkins |
-| **Monitoring**        | Prometheus, ELK/OpenSearch           |
-| **App Framework**     | TBD                                  |
-| **Database**          | TBD                                  |
+| Layer              | Tools                                |
+| ------------------ | ------------------------------------ |
+| Infrastructure     | Terraform                            |
+| Host Configuration | Ansible                              |
+| Runtime            | Docker                               |
+| Cloud Provider     | AWS / Azure / GCP                    |
+| CI/CD              | GitHub Actions / GitLab CI / Jenkins |
+| Monitoring         | Prometheus, ELK/OpenSearch           |
+| App Framework      | Python CLI / GTK / FastAPI / Flask   |
+| Database           | SQLite (MVP) / RDS (Cloud)           |
 
 ---
 
 ## Status
 
-**Active development**
-Architecture, IaC layout, and base automation are being built.
+**Active development** – infrastructure, automation, and Python MVP are in progress.
 
 ---
 
 ## Purpose
 
-This repository serves as a **learning platform** and **real-world rebuild** to strengthen skills in:
+This repository is a **learning platform and real-world rebuild** to strengthen:
 
 * Cloud engineering
-* DevOps workflows
-* Infrastructure automation
-* Multi-tier architecture design
+* DevOps workflows and automation
+* Multi-tier application design
+* Infrastructure-as-Code practices
+
+---
