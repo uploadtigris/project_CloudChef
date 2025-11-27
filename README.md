@@ -1,4 +1,4 @@
-\# ChefTec Modern Rebuild
+# ChefTec Modern Rebuild
 
 A full, modern recreation of the **ChefTec** application using cloud-native patterns, Infrastructure-as-Code, containerization, and automated deployments.
 
