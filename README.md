@@ -1,5 +1,7 @@
 # ChefTec Modern Rebuild
 
+![](https://github.com/uploadtigris/project_CloudChef/blob/94fcb199895cdc0702a341eb6987e11ecdd705a1/images/CloudChefLogo.png)
+
 A full, modern recreation of the **ChefTec** application using cloud-native patterns, Infrastructure-as-Code, containerization, and automated deployments.
 
 ---
