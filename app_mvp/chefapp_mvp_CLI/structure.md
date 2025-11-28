@@ -20,8 +20,23 @@ chefapp/
 
 ### Running the application
 ```python
-python run_cli.py --init-db
+python3 run_cli.py --init-db
 ```
 ```python
-python run_cli.py --cost "Pizza"
+python3 run_cli.py --cost "Pizza"
+```
+
+### checking on the DB
+
+```
+sqlite3 data/chefapp.db
+```
+
+```
+| Command                      | What it does         |
+| ---------------------------- | -------------------- |
+| `.tables`                    | list all tables      |
+| `.schema ingredients`        | show table structure |
+| `SELECT * FROM ingredients;` | show table contents  |
+| `.exit`                      | exit                 |
 ```
