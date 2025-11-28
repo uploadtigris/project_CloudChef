@@ -17,3 +17,11 @@ chefapp/
 │
 └── run_cli.py
 ```
+
+### Running the application
+```python
+python run_cli.py --init-db
+```
+```python
+python run_cli.py --cost "Pizza"
+```
